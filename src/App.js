@@ -1,23 +1,47 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
+import ReactPlayer from 'react-player';
+import movieTrailer from 'movie-trailer';
 
 function App() {
+
+  const [video, setVideo] = useState("");
+  const [videoURL, setVideoURL] = useState("");
+  const [error, setError] = useState(null);
+
+  async function handleSearch() {
+    setError(null);
+    setVideoURL("");
+
+    try {
+      const url = await movieTrailer(video);
+      if (url) {
+        setVideoURL(url);
+      } else {
+        throw new Error("Trailer not found!");
+      }
+    } catch (err) {
+      setError("⚠️ No trailer found. Try a different title.");
+    }
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>🎬 Movie Trailer Finder</h1>
+      <div className="search-box">
+        <label>Search for a movie/show:</label>
+        <input
+          type='text'
+          value={video}
+          onChange={(e) => setVideo(e.target.value)}
+          placeholder='Enter movie title...'
+        />
+        <button onClick={handleSearch}>🔍 Search</button>
+      </div>
+      {error && <p className="error">{error}</p>}
+      {videoURL && (
+        <ReactPlayer url={videoURL} controls={true} />
+      )}
     </div>
   );
 }
